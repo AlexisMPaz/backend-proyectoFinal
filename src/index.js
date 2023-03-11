@@ -6,6 +6,7 @@ import * as path from 'path';
 import { routerProduct } from './routes/products.routes.js';
 import { routerHandlebars } from './routes/handlebars.routes.js';
 import { routerUpload } from './routes/upload.routes.js';
+import { routerCarts } from './routes/carts.routes.js';
 
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
@@ -26,6 +27,7 @@ app.use('/', express.static(__dirname + '/public'));
 app.use('/', routerHandlebars);
 app.use('/upload', routerUpload);
 app.use('/api/products', routerProduct);
+app.use('/api/carts', routerCarts)
 
 app.set("port", process.env.PORT || 8080);
 

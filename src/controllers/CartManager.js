@@ -36,7 +36,7 @@ export class CartManager {
             return `Error: El Carrito ID: ${idCart} no existe`;
         }
 
-        const products = JSON.parse(await fs.readFile("./src/models/products.json", 'utf-8'));
+        const products = JSON.parse(await fs.readFile("./src/dao/FileSystem/models/products.json", 'utf-8'));
         const product = products.find(prod => prod.id === idProduct);
 
         if (!product) {

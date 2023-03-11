@@ -19,7 +19,6 @@ if (window.location.pathname === '/chat') {
             newMessage[key] = value;
         });
         
-        console.log(newMessage)
         socket.emit("message", newMessage);
         message.value = "";
     })
