@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
+import paginate from 'mongoose-paginate-v2'
 
 const url = process.env.URLMONGODB;
 
@@ -40,6 +41,8 @@ const productSchema = new Schema({
         default: ["/img/torre.png"]
     }
 })
+
+productSchema.plugin(paginate);
 
 class ManagerProducts extends ManagerMongoDB {
     constructor() {

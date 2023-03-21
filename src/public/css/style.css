@@ -73,7 +73,7 @@ body {
 .artifactCard {
     background-color: rgba(20, 31, 49, 0.7);
     padding: 1rem;
-    min-height: 200px;
+    min-height: 360px;
 }
 
 /* Default Style */
@@ -92,7 +92,6 @@ body {
 
 .navContainer {
     background-color: rgba(20, 31, 49, 0.7);
-    height: 95.39px;
 }
 
 .footerContainer {

@@ -9,7 +9,7 @@ export class ManagerMongoDB {
         this.model = mongoose.model(this.collection, this.schema)
     }
 
-    async #setConnection() {
+    async _setConnection() {
         try {
             await mongoose.connect(this.#url, {dbName: 'ecommerce'});
             console.log("DB is connected");
@@ -19,8 +19,17 @@ export class ManagerMongoDB {
         }
     }
 
+    async paginateElements(filters, options) {
+        await this._setConnection();
+        try {
+            return await this.model.paginate(filters, options)
+        } catch (error) {
+            return error
+        }
+    }
+
     async addElements(elements) {
-        this.#setConnection();
+        await this._setConnection();
         try {
             return await this.model.insertMany(elements);
         } catch(error) {
@@ -29,9 +38,9 @@ export class ManagerMongoDB {
     }
 
     async getElements() {
-        this.#setConnection();
+        await this._setConnection();
         try {    
-            return await this.model.find().lean();
+            return await this.model.find();
         } catch(error) {
             return error;
         }
@@ -39,16 +48,16 @@ export class ManagerMongoDB {
 
     async getElementByID(id) {
         console.log(id)
-        this.#setConnection();
+        await this._setConnection();
         try {
             return await this.model.findById(id)
         } catch(error) {
-            return error;
+            return null;
         }
     }
 
     async updateElement(id, info) {
-        this.#setConnection();
+        await this._setConnection();
         try {
             return await this.model.findByIdAndUpdate(id, info)
         } catch(error) {
@@ -57,7 +66,7 @@ export class ManagerMongoDB {
     }
 
     async deleteElement(id) {
-        this.#setConnection();
+        await this._setConnection();
         try {
             return await this.model.findByIdAndDelete(id)
         } catch(error) {
