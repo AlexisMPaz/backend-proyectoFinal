@@ -52,7 +52,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.findById(id)
         } catch(error) {
-            return null;
+            return error;
         }
     }
 

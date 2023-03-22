@@ -6,137 +6,143 @@ export const managerCarts = new data();
 
 export const createCart = async (req, res) => {
     try {
-        const newCart = {}
-        await managerCarts.addElements(newCart);
+        const response = await managerCarts.addElements();
 
-        res.send({ response: 'success' });
+        return res.status(200).json(response);
 
     } catch (error) {
-
-        res.send({
-            status: "error",
-            payload: error
-        });
+        res.status(500).json({
+            message: error.message
+        })
     }
-
 }
 
 export const getCart = async (req, res) => {
     try {
-        const idCart = req.params.cid
+        const idCart = req.params.cid;
 
         const cart = await managerCarts.getElementByID(idCart);
 
-        res.send({
-            status: "success",
-            payload: cart
-        })
+        if (cart) {
+            return res.status(200).json(cart);
+        }
+
+        res.status(200).json({
+            message: "Carrito no encontrado"
+        });
 
     } catch (error) {
-        res.send({
-            status: "error",
-            payload: error
+        res.status(500).json({
+            message: error.message
         });
     }
 }
 
 export const updateCartProducts = async (req, res) => {
+
+    const idCart = req.params.cid
+    const info = req.body;
+
     try {
-        const idCart = req.params.cid
-        const info = req.body;
+        const products = await managerCarts.updateElement(idCart, info);
 
-        await managerCarts.updateElement(idCart, info);
+        if (products) {
+            return res.status(200).json({
+                message: "Productos actualizados"
+            })
+        }
 
-        const cart = await managerCarts.getElementByID(idCart);
-
-        res.send({
-            status: "success",
-            payload: cart
+        res.status(200).json({
+            message: "Productos no encontrados"
         })
 
-
     } catch (error) {
-        res.send({
-            status: "error",
-            payload: error
-        });
+        res.status(500).json({
+            message: error.message
+        })
     }
 
 }
 
 export const addProductToCart = async (req, res) => {
-    try {
-        const idCart = req.params.cid;
-        const idProduct = req.params.pid;
 
+    const idCart = req.params.cid;
+    const idProduct = req.params.pid;
+
+    try {
         const realProduct = await managerProducts.getElementByID(idProduct);
 
         if (realProduct) {
 
             const cart = await managerCarts.addToCart(idCart, idProduct);
 
-            res.send({
-                status: "success",
-                payload: cart
+            if (cart) {
+                return res.status(200).json(cart);
+            }
+
+            res.status(200).json({
+                message: "Carrito no encontrado"
             });
 
-        } else {
-            res.send({
-                status: "error",
-                payload: `No existe el producto ID: ${idProduct}`
-            });
         }
 
-    } catch (error) {
+        res.status(200).json({
+            message: "Producto no Existe"
+        });
 
-        res.send({
-            status: "error",
-            payload: error
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
         });
     }
-
 }
 
 export const updateProductQuantity = async (req, res) => {
+
+    const { quantity } = req.body;
+
+    const idCart = req.params.cid;
+    const idProduct = req.params.pid;
+    const newQuantity = parseInt(quantity);
+
     try {
-        const { quantity } = req.body;
+        const cart = await managerCarts.updateQuantity(idCart, idProduct, newQuantity);
 
-        const idCart = req.params.cid;
-        const idProduct = req.params.pid;
-        const newQuantity = parseInt(quantity);
+        if (cart) {
+            return res.status(200).json(cart);
+        }
 
-        const updatedProduct = await managerCarts.updateQuantity(idCart, idProduct, newQuantity);
-
-        res.send({
-            status: "success",
-            payload: updatedProduct
-        })
-
+        res.status(200).json({
+            message: "Carrito no encontrado"
+        });
 
     } catch (error) {
-        res.send({
-            status: "error",
-            payload: error
+        res.status(500).json({
+            message: error.message
         });
     }
 
 }
 
 export const deleteCartProducts = async (req, res) => {
+
+    const idCart = req.params.cid;
+    const info = { products: [] }
+
     try {
-        const idCart = req.params.cid;
-        const info = { products: [] }
+        const cart = await managerCarts.updateElement(idCart, info);
 
-        await managerCarts.updateElement(idCart, info);
+        if (cart) {
+            return res.status(200).json(cart);
+        }
 
-        res.send({
-            status: "success",
-        })
+        res.status(200).json({
+            message: "Carrito no encontrado"
+        });
 
     } catch (error) {
-        res.send({
-            status: "error",
-            payload: error
+        res.status(500).json({
+            message: error.message
         });
     }
 }
@@ -146,17 +152,19 @@ export const deleteCartProduct = async (req, res) => {
         const idCart = req.params.cid;
         const idProduct = req.params.pid;
 
-        const updatedProduct = await managerCarts.deleteProduct(idCart, idProduct);
+        const cart = await managerCarts.deleteProduct(idCart, idProduct);
 
-        res.send({
-            status: "success",
-            payload: updatedProduct
-        })
+        if (cart) {
+            return res.status(200).json(cart);
+        }
+
+        res.status(200).json({
+            message: "Carrito no encontrado"
+        });
 
     } catch (error) {
-        res.send({
-            status: "error",
-            payload: error
+        res.status(500).json({
+            message: error.message
         });
     }
 }
