@@ -15,7 +15,7 @@ routerViews.get('/', async (req, res) => {
 routerViews.get('/products', async (req, res) => {
     try {
         //Parametros de consulta con sus respectivos default en caso de no existir
-        const { limit = 10, page = 1, sort, category } = req.query;
+        const { limit = 10, page = 1, sort = "", category = "" } = req.query;
 
         //Filtros
         const filters = { stock: { $gt: 0 } };

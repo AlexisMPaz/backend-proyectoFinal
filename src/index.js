@@ -4,7 +4,9 @@ import { __filename, __dirname } from './path.js';
 import * as path from 'path';
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
-import session from 'express-session';
+// import cookieParser from 'cookie-parser'
+// import session from 'express-session'
+// import MongoStore from 'connect-mongo';
 
 //import Routes
 import { routerProduct } from './routes/products.routes.js';
@@ -28,6 +30,17 @@ app.engine('handlebars', engine({
 }));
 app.set('view engine', 'handlebars');
 app.set('views', path.resolve(__dirname, './views'));
+// app.use(cookieParser(process.env.COOKIE_SECRET));
+// app.use(session({
+//     store: MongoStore.create({
+//         mongoURL: process.env.URLMONGODB,
+//         mongoOptions: { useNewUrlParser: true, udeUnifiedTopology: true },
+//         ttl: 15
+//     }),
+//     secret: process.env.SESSION_SECRET,
+//     resave: true,
+//     saveUninitialized: true
+// }));
 
 //Routes
 app.use('/', express.static(__dirname + '/public'));
@@ -58,4 +71,5 @@ io.on("connection", (socket) => {
         })
     })
 })
+
 
