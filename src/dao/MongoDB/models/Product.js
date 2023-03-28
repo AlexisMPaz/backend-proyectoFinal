@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
+import { ManagerMongoDB } from "../db/mongoDBManager.js";
 import paginate from 'mongoose-paginate-v2'
 
 const url = process.env.URLMONGODB;

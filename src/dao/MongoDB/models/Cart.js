@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
+import { ManagerMongoDB } from "../db/mongoDBManager.js";
 
 const url = process.env.URLMONGODB;
 
@@ -35,75 +35,80 @@ class ManagerCarts extends ManagerMongoDB {
   async addToCart(idCart, idProduct) {
     await this._setConnection();
 
-    // Tomar el carrito de la base de datos
-    const cart = await this.model.findById(idCart);
+    try {
+      const cart = await this.model.findById(idCart);
+      const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
 
-    // Verificar que exista el producto dentro del array y tomar su indice si existe
-    const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
+      if (productIndex === -1) {
+        cart.products.push({ productId: idProduct });
 
-    //Agrega el producto o suma en 1 a su cantidad si ya existe
-    if (productIndex === -1) {
-      cart.products.push({ productId: idProduct });
+      } else {
+        cart.products[productIndex].quantity += 1;
+      }
 
-    } else {
-      cart.products[productIndex].quantity += 1;
+      return await cart.save();
+
+
+    } catch (error) {
+      throw error
     }
-
-    // Guardar el documento actualizado
-    return await cart.save();
   }
 
   async updateQuantity(idCart, idProduct, newQuantity) {
     await this._setConnection();
 
-    // Tomar el carrito de la base de datos
-    const cart = await this.model.findById(idCart);
+    try {
+      const cart = await this.model.findById(idCart);
+      const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
 
-    // Verificar que exista el producto dentro del array y tomar su indice si existe
-    const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
+      if (productIndex === -1) {
+        throw new Error('El producto no existe en el carrito.');
+      }
 
-    if (productIndex === -1) {
-      throw new Error('El producto no existe en el carrito.');
+      cart.products[productIndex].quantity = newQuantity;
+
+      return await cart.save();
+
+    } catch (error) {
+      throw error
     }
-
-    // Actualizar la cantidad del producto
-    cart.products[productIndex].quantity = newQuantity;
-
-    // Guardar el documento actualizado
-    return await cart.save();
   }
 
   async deleteProduct(idCart, idProduct) {
     await this._setConnection();
 
-    // Tomar el carrito de la base de datos
-    const cart = await this.model.findById(idCart);
+    try {
+      const cart = await this.model.findById(idCart);
+      const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
 
-    // Verificar que exista el producto dentro del array y tomar su indice si existe
-    const productIndex = cart.products.findIndex(product => product.productId.equals(idProduct));
+      if (productIndex === -1) {
+        throw new Error('El producto no existe en el carrito.');
+      }
 
-    if (productIndex === -1) {
-      throw new Error('El producto no existe en el carrito.');
+      cart.products.splice(productIndex, 1);
+
+      return await cart.save();
+
+    } catch (error) {
+      throw error
     }
 
-    // Eliminar el producto
-    cart.products.splice(productIndex, 1);
-
-    // Guardar el documento actualizado
-    return await cart.save();
   }
 
   async cartPopulate(idCart, model) {
     await this._setConnection();
-    
+
     try {
-      // Tomar el carrito de la base de datos
       const cart = await this.model.findById(idCart);
+
+      if (!cart) {
+        throw new Error(`El carrito no existe`);
+      }
 
       return await cart.populate({ path: "products.productId", model: model })
 
     } catch (error) {
-      return null
+      throw error
     }
   }
 }

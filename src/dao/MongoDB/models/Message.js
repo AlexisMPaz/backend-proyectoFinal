@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
+import { ManagerMongoDB } from "../db/mongoDBManager.js";
 
 const url = process.env.URLMONGODB;
 
