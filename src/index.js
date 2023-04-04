@@ -1,30 +1,22 @@
 import 'dotenv/config';
 import express from 'express';
 import session from 'express-session';
-import { Server } from 'socket.io';
-import { engine } from 'express-handlebars';
+import cookieParser from 'cookie-parser';
 import MongoStore from 'connect-mongo';
-import  router  from './routes/index.routes.js';
+import passport from 'passport'
+import { engine } from 'express-handlebars';
+import { Server } from 'socket.io';
 import { __dirname } from './path.js';
 import * as path from 'path';
+import  router  from './routes/index.routes.js';
 import { managerMessages } from './controllers/Messages.js';
+import { initializePassport } from './config/passport.js'
 
 const app = express();
 
 //Middlewares
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.set('view engine', 'handlebars');
-app.set('views', path.resolve(__dirname, './views'));
-app.set("port", process.env.PORT || 8080);
-
-app.engine('handlebars', engine({
-    runtimeOptions: {
-        allowProtoPropertiesByDefault: true,
-        allowProtoMethodsByDefault: true,
-    }
-}));
-
+app.use(express.urlencoded({ extended: true }))
 app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.URLMONGODB,
@@ -35,6 +27,22 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+
+//Passport
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.engine('handlebars', engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+}));
+app.set('view engine', 'handlebars');
+app.set('views', path.resolve(__dirname, './views'));
+
+app.set("port", process.env.PORT || 8080);
 
 //Routes
 app.use('/', express.static(__dirname + '/public'));

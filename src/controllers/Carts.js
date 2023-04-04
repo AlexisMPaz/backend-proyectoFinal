@@ -21,7 +21,7 @@ export const getCart = async (req, res) => {
     try {
         const idCart = req.params.cid;
 
-        const cart = await managerCarts.getElementByID(idCart);
+        const cart = await managerCarts.getElementById(idCart);
 
         if (cart) {
             return res.status(200).json(cart);
@@ -70,7 +70,7 @@ export const addProductToCart = async (req, res) => {
     const idProduct = req.params.pid;
 
     try {
-        const realProduct = await managerProducts.getElementByID(idProduct);
+        const realProduct = await managerProducts.getElementById(idProduct);
 
         if (realProduct) {
 

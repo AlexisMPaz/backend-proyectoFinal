@@ -76,6 +76,19 @@ body {
     min-height: 360px;
 }
 
+.gitHubBtn {
+    background-color: #343a40;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.githubLink {
+    text-decoration: none;
+    color: rgb(203, 208, 216);
+    --bs-nav-link-hover-color: rgb(211, 172, 43);
+}
+
 /* Default Style */
 
 .mainContainer {

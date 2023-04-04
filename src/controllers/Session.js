@@ -1,6 +1,4 @@
-import { managerUsers } from "./Users.js"
-import { comparePassword } from "../utils/bcrypt.js"
-import { adminUser } from "./Users.js"
+import passport from "passport";
 
 export const getSession = (req, res) => {
     if (req.session.login) {
@@ -21,43 +19,26 @@ export const getSession = (req, res) => {
 }
 
 export const testLogin = async (req, res) => {
-    const { email, password } = req.body
-
-    if (email === adminUser.email && comparePassword(password, adminUser.password)) {
+    passport.authenticate('login', (err, user) => {
+        if (err) {
+            return res.status(500).json({
+                message: err
+            });
+        }
+        if (!user) {
+            return res.status(200).json({
+                status: "failure",
+                response: "Correo electrónico o contraseña incorrecta"
+            });
+        }
         req.session.login = true;
-        req.session.name = adminUser.first_name;
-        req.session.role = adminUser.role;
-
+        req.session.name = user.first_name;
+        req.session.role = user.role;
         return res.status(200).json({
             status: "success",
             greetings: `Bienvenido ${req.session.name}, tu rol es ${req.session.role}`
         });
-    }
-
-    try {
-        const user = await managerUsers.getUserByEmail(email);
-
-        if (user && comparePassword(password, user.password)) {
-            req.session.login = true;
-            req.session.name = user.first_name;
-            req.session.role = user.role;
-
-            res.status(200).json({
-                status: "success",
-                greetings: `Bienvenido ${req.session.name}, tu rol es ${req.session.role}`
-            });
-        } else {
-            res.status(200).json({
-                status: "failure",
-                response: "El usuario no existe"
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
+    })(req, res);
 }
 
 export const destroySession = (req, res) => {

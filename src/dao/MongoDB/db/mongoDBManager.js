@@ -37,6 +37,15 @@ export class ManagerMongoDB {
         }
     }
 
+    async addOneElement(element) {
+        await this._setConnection();
+        try {
+            return await this.model.create(element);
+        } catch(error) {
+            return error;
+        }
+    }
+
     async getElements() {
         await this._setConnection();
         try {    
@@ -46,7 +55,7 @@ export class ManagerMongoDB {
         }
     }
 
-    async getElementByID(id) {
+    async getElementById(id) {
         console.log(id)
         await this._setConnection();
         try {

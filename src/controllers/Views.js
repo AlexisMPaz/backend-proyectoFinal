@@ -1,8 +1,9 @@
 import { managerCarts } from "./Carts.js";
 import { managerProducts } from "./Products.js";
-import { managerUsers } from "./Users.js";
+import { managerUsers } from "../config/passport.js";
 import { comparePassword, createHash } from "../utils/bcrypt.js";
 import { adminUser } from "./Users.js";
+import passport from "passport";
 
 export const viewProducts = async (req, res) => {
     const { limit = 10, page = 1, sort = "", category = "" } = req.query;
@@ -38,11 +39,11 @@ export const viewProducts = async (req, res) => {
             isLoggedIn: req.session.login
         };
 
-        res.render("products", { 
+        res.render("products", {
             products, user
         });
 
-        
+
 
     } catch (error) {
         console.log(error);
@@ -54,7 +55,7 @@ export const viewDetails = async (req, res) => {
     const idProduct = req.params.pid;
 
     try {
-        const product = await managerProducts.getElementByID(idProduct);
+        const product = await managerProducts.getElementById(idProduct);
 
         res.render("details", {
             product
@@ -108,34 +109,22 @@ export const sessionChecker = (req, res, next) => {
 }
 
 export const login = async (req, res) => {
-    const { email, password } = req.body
-
-    if (email === adminUser.email && comparePassword(password, adminUser.password)) {
-        req.session.login = true;
-        req.session.name = adminUser.first_name;
-        req.session.role = adminUser.role;
-        return res.redirect('/products');
-    }
-
-    try {
-        const user = await managerUsers.getUserByEmail(email);
-
-        if (user && comparePassword(password, user.password)) {
-            req.session.login = true;
-            req.session.name = user.first_name;
-            req.session.role = user.role;
-            res.redirect('/products');
-
-        } else {
-            req.session.message = "Usuario no existe";
-            res.redirect('/login')
+    passport.authenticate('login', (err, user) => {
+        if (err) {
+            req.session.message = "Ha ocurrido un error, intente mas tarde";
+            return res.redirect('/login');
+        }
+        if (!user) {
+            req.session.message = "Correo electrónico o contraseña incorrecta";
+            return res.redirect('/login');
         }
 
-    } catch (error) {
-        console.log(error);
-        req.session.message = "Hubo un error, intente mas tarde";
-        res.redirect('/login');
-    }
+        req.session.login = true;
+        req.session.name = user.first_name;
+        req.session.role = user.role;
+        return res.redirect('/products');
+
+    })(req, res);
 }
 
 export const logout = (req, res) => {
@@ -143,33 +132,19 @@ export const logout = (req, res) => {
     res.redirect('/login')
 }
 
-export const register = async (req, res) => {
-    const { first_name, last_name, email, age, password } = req.body
-
-    try {
-        const user = await managerUsers.getUserByEmail(email)
-
-        if (user) {
-            req.session.message = "Email en uso";
-            res.redirect('/register');
-        } else {
-            const hashPassword = createHash(password);
-
-            await managerUsers.addElements([{
-                first_name: first_name,
-                last_name: last_name,
-                email: email,
-                age: age,
-                password: hashPassword
-            }])
-
-            req.session.message = "Registrado correctamente, ya puede logearse";
-            res.redirect('/login');
+export const register = (req, res) => {
+    passport.authenticate('register', (err, user) => {
+        if (err) {
+            req.session.message = "Ha ocurrido un error durante el registro";
+            return res.redirect('/register');
+        }
+        if (!user) {
+            req.session.message = "El correo electrónico ya está en uso";
+            return res.redirect('/register');
         }
 
-    } catch (error) {
-        console.log(error);
-        req.session.message = "Hubo un error, intente mas tarde";
-        res.redirect('/register');
-    }
+        req.session.message = "Registrado correctamente, ya puede logearse";
+        return res.redirect('/login');
+
+    })(req, res);
 }

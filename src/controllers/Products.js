@@ -62,7 +62,7 @@ export const getProduct = async (req, res) => {
     const idProduct = req.params.pid;
 
     try {
-        const product = await managerProducts.getElementByID(idProduct);
+        const product = await managerProducts.getElementById(idProduct);
 
         if (product) {
             return res.status(200).json(product)
