@@ -19,8 +19,7 @@ routerGithub.get('/callback', (req, res, next) => {
         }
 
         req.session.login = true;
-        req.session.name = user.first_name;
-        req.session.role = user.role;
+        req.session.user = user;
         return res.redirect('/products');
 
     })(req, res, next);

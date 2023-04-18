@@ -30,6 +30,11 @@ const userSchema = new Schema({
     role: {
         type: String,
         default: "Usuario"
+    },
+    cartId: {
+        type: Schema.Types.ObjectId,
+        ref: 'carts',
+        required: true
     }
 })
 

@@ -2,8 +2,8 @@ import local from 'passport-local';
 import passport from 'passport';
 import GitHubStrategy from 'passport-github2';
 import { getManagerUsers } from '../dao/daoManager.js';
+import { managerCarts } from '../controllers/Carts.js';
 import { createHash, comparePassword } from '../utils/bcrypt.js';
-import { generateToken, authToken } from '../utils/jwt.js';
 
 const data = await getManagerUsers();
 export const managerUsers = new data();
@@ -11,14 +11,17 @@ export const managerUsers = new data();
 const LocalStrategy = local.Strategy;
 
 export const initializePassport = () => {
+
     passport.use('register', new LocalStrategy(
         { passReqToCallback: true, usernameField: 'email' }, async (req, username, password, done) => {
             const { first_name, last_name, email, age } = req.body;
             try {
                 const user = await managerUsers.getUserByEmail(username);
+                console.log(user)
                 if (user) {
                     return done(null, false);
                 }
+                const cart = await managerCarts.addOneElement()
                 const hashPassword = createHash(password);
                 const newUser = await managerUsers.addOneElement({
                     first_name: first_name,
@@ -26,9 +29,10 @@ export const initializePassport = () => {
                     email: email,
                     age: age,
                     role: "Usuario",
-                    password: hashPassword
+                    password: hashPassword,
+                    cartId: cart._id
                 })
-                const token = generateToken(newUser);
+                console.log(newUser)
                 return done(null, newUser);
             } catch (error) {
                 return done(error);
@@ -60,11 +64,11 @@ export const initializePassport = () => {
 
         try {
             const user = await managerUsers.getUserByEmail(profile._json.email);
-            console.log(user)
 
             if (user) { //Usuario ya existe en BDD
                 return done(null, user)
             } else {
+                const cart = await managerCarts.addOneElement()
                 const passwordHash = createHash('coder123')
                 const userCreated = await managerUsers.addOneElement({
                     first_name: profile._json.name,
@@ -72,7 +76,8 @@ export const initializePassport = () => {
                     email: profile._json.email,
                     age: 18,
                     role: "Usuario",
-                    password: passwordHash //Contraseña por default ya que no puedo acceder a la contraseña de github
+                    password: passwordHash,
+                    cartId: cart._id
                 });
 
                 console.log(userCreated)

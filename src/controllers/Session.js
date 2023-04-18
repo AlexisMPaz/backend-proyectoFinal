@@ -58,3 +58,18 @@ export const destroySession = (req, res) => {
 
     }
 }
+
+export const current = (req, res) => {
+    if (req.session.login) {
+
+        res.status(200).json({
+            response: req.session.user
+        });
+
+    } else {
+        res.status(200).json({
+            status: "failure",
+            response: "No existe sesion activa"
+        });
+    }
+}

@@ -15,7 +15,7 @@ export class ManagerMongoDB {
             console.log("DB is connected");
 
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -24,7 +24,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.paginate(filters, options)
         } catch (error) {
-            return error
+            throw error
         }
     }
 
@@ -33,7 +33,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.insertMany(elements);
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -42,7 +42,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.create(element);
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -51,7 +51,7 @@ export class ManagerMongoDB {
         try {    
             return await this.model.find();
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -61,7 +61,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.findById(id)
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -70,7 +70,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.findByIdAndUpdate(id, info)
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 
@@ -79,7 +79,7 @@ export class ManagerMongoDB {
         try {
             return await this.model.findByIdAndDelete(id)
         } catch(error) {
-            return error;
+            throw error;
         }
     }
 }

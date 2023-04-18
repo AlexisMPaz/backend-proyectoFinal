@@ -33,14 +33,11 @@ export const viewProducts = async (req, res) => {
             nextLink: nextLink
         };
 
-        const user = {
-            name: req.session.name,
-            role: req.session.role,
-            isLoggedIn: req.session.login
-        };
+        const user = req.session.user
+        const isLoggedIn = req.session.login
 
         res.render("products", {
-            products, user
+            products, user , isLoggedIn
         });
 
 
@@ -68,7 +65,7 @@ export const viewDetails = async (req, res) => {
 }
 
 export const viewCart = async (req, res) => {
-    const idCart = req.params.cid;
+    const idCart = req.session.user.cartId;
 
     try {
         const cart = await managerCarts.cartPopulate(idCart, managerProducts.model);
@@ -109,42 +106,18 @@ export const sessionChecker = (req, res, next) => {
 }
 
 export const login = async (req, res) => {
-    passport.authenticate('login', (err, user) => {
-        if (err) {
-            req.session.message = "Ha ocurrido un error, intente mas tarde";
-            return res.redirect('/login');
-        }
-        if (!user) {
-            req.session.message = "Correo electrónico o contraseña incorrecta";
-            return res.redirect('/login');
-        }
-
-        req.session.login = true;
-        req.session.name = user.first_name;
-        req.session.role = user.role;
-        return res.redirect('/products');
-
-    })(req, res);
+    req.session.login = true;
+    req.session.user = req.user;
+    return res.redirect('/products');
 }
 
 export const logout = (req, res) => {
+    //delete req.session.user;
     req.session.destroy()
     res.redirect('/login')
 }
 
 export const register = (req, res) => {
-    passport.authenticate('register', (err, user) => {
-        if (err) {
-            req.session.message = "Ha ocurrido un error durante el registro";
-            return res.redirect('/register');
-        }
-        if (!user) {
-            req.session.message = "El correo electrónico ya está en uso";
-            return res.redirect('/register');
-        }
-
-        req.session.message = "Registrado correctamente, ya puede logearse";
-        return res.redirect('/login');
-
-    })(req, res);
+    req.session.message = "Registrado correctamente, ya puede logearse";
+    return res.redirect('/login');
 }
